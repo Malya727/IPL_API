@@ -1,65 +1,63 @@
 import pymongo
-
 myclient = pymongo.MongoClient("mongodb+srv://react:react@react-pmnjq.mongodb.net/test?retryWrites=true&w=majority")
 
 db = myclient.IPL_2020
 
-#Returns all the lables of teams
-def get_team_labels():
-    collection = db.Team_Details
-    label = [x["label"] for x in collection.find({},{"_id":0,"label" : 1})]
-    return label
 
-#Returns all the team details
-def get_all_team_details():
+def get_team_names():
     collection = db.Team_Details
-    teams = [x for x in collection.find({},)]
-    return teams
+    teamLabels = []
+    for x in collection.find({},{'_id':0,'label':1}):
+        teamLabels.append(x['label'])
+    return teamLabels
 
-#Returns all players
+def get_team_details():
+    collection = db.Team_Details
+    teamList = []
+    for x in collection.find({}):
+        teamList.append(x)
+    return teamList
+
 def get_all_players():
     collection = db.Player_Details
-    players = [i for i in collection.find({})]
-    return players
+    playersList = []
+    for x in collection.find({}):
+        playersList.append(x)
+    return playersList
 
-#Returns all the players who has label teamName
 def get_team_players(teamName):
-    collection = db.Player_Details
-    players = [i for i in collection.find({"label": teamName})]
+    collection = db.Player_Details 
+    players = []
+    for x in collection.find({"label":teamName}):
+        players.append(x)
     return players
 
-def get_players_nums(teamname):
+def get_count_role(teamName):
     collection = db.Player_Details
-    res = collection.aggregate([
-        {"$match" : {"label" : teamname}},
-        {"$group" : {"_id":"$role","total" : {"$sum" : 1}} },
-        #{"$project" : {"Role" : "$_id", "total" : 1}}
-    ])
-    return [x for x in res]
+    count = []
+    for x in collection.aggregate([{'$match':{"label":teamName}},{'$group':{'_id':{"role":"$role","team":"$label"},'count':{'$sum':1}}},{'$project':{"role":"$_id.role",'count':1,'_id':0}},{'$sort':{"team":1}}]):
+        count.append(x)
+    return count
 
-def get_all_player_nums():
+def get_players_role_count_ipl():
     collection = db.Player_Details
-    res = collection.aggregate([
-        {"$group" : {"_id":{"role" : "$role","team": "$label"},"total" : {"$sum" : 1}} },
-        {"$project" : {"Role" : "$_id.role","Team":"$_id.team", "total" : 1,"_id":0}}
-    ])
-    return [x for x in res]
-#teams stats max,min,avg,total salary
+    role_count = []
+    for x in collection.aggregate([{"$group":{"_id":"$role","count":{"$sum":1}}},{"$project":{"role":"$_id","count":1,"_id":0}}]):
+        role_count.append(x)
+    return role_count
+    
 
-def get_stats():
+def get_stat_team(teamname):
     collection = db.Player_Details
-    res = collection.aggregate([
-        {"$group" : {"_id":"","max" : {"$max" : "$price"},"min" : {"$min" : "$price"},"avg" : {"$avg" : "$price"},"total" : {"$sum" : "$price"}} },
-        {"$project" : {"max":1,"min":1,"avg":1,"total" : 1,"_id":0}}
-    ])
-    return [x for x in res]
+    stat = []
+    for x in collection.aggregate([{"$match":{"label":teamname}},{"$group":{"_id":"$role","Max":{"$max":"$price"},"Min":{"$min":"$price"},"Avg":{"$avg":"$price"},"Total":{"$sum":"$price"}}},{"$project":{"role":"$_id","_id":0,"Max":1,"Min":1,"Avg":1,"Total":1}}]):
+        stat.append(x)
+    return stat
+    
 
-def get_stats_by_team(teamname):
+def get_stat_ipl():
     collection = db.Player_Details
-    res = collection.aggregate([
-        {"$match" : {"label" : teamname}},
-        {"$group" : {"_id":"$label","max" : {"$max" : "$price"},"min" : {"$min" : "$price"},"avg" : {"$avg" : "$price"},"total" : {"$sum" : "$price"}} },
-        {"$project" : {"team":"$_id","max":1,"min":1,"avg":1,"total" : 1,"_id":0}}
-    ])
-    return [x for x in res]
-
+    stat = []
+    for x in collection.aggregate([{"$group":{"_id":"$role","count":{"$sum":1},"Max":{"$max":"$price"},"Min":{"$min":"$price"},"Avg":{"$avg":"$price"},"Total":{"$sum":"$price"}}},{"$project":{"role":"$_id","_id":0,"Max":1,"Min":1,"Avg":1,"Total":1,"count":1}}]):
+        stat.append(x)
+    return stat
