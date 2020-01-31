@@ -81,3 +81,13 @@ def ipl_team_stat():
     ])
     return [r for r in res]
 
+def stat_role_price_by_team(teamname):
+    collection=db.player
+    res = collection.aggregate([
+        {"$match":{"label":teamname}},
+        {"$group":{"_id":"$role","amount":{"$sum":"$price"}}},
+        {"$project":{"role":"$_id","amount":1,"_id":0}}
+    ])
+    return [r for r in res]
+
+

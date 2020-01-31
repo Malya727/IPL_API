@@ -57,5 +57,10 @@ def ipl_team_stat():
     stat = idb.ipl_team_stat()
     return jsonify({"stat":stat})
 
+@app.route("/ipl/rolestat/<teamname>")
+def stat_role_price_by_team(teamname):
+    stat = idb.stat_role_price_by_team(teamname)
+    return jsonify({"stat":stat})
+
 if __name__ == "__main__":
     app.run()
