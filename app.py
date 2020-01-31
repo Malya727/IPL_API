@@ -31,6 +31,7 @@ def players():
 def team_players(teamname):
     players = idb.get_team_players(teamname)
     return jsonify({"players":players})
+    
 @app.route("/ipl/team/rolestat/<teamname>")
 def team_role_count(teamname):
     team_count = idb.get_players_role_count_by_team(teamname)
@@ -51,7 +52,10 @@ def all_team_stat():
     stat = ""
     return jsonify({"stat":stat})
     
-
+@app.route("/ipl/allteamstat")
+def ipl_team_stat():
+    stat = idb.ipl_team_stat()
+    return jsonify({"stat":stat})
 
 if __name__ == "__main__":
     app.run()

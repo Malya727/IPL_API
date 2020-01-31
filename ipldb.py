@@ -73,3 +73,11 @@ def get_players_by_role_by_team(role,teamName):
     res = collection.find({"role":role,"label":teamName})
     return [ x for x in res]
 
+def ipl_team_stat():
+    collection=db.player
+    res = collection.aggregate([
+        {"$group":{"_id":"$label","amount":{"$sum":"$price"}}},
+        {"$project":{"team":"$_id","amount":1,"_id":0}}
+    ])
+    return [r for r in res]
+
