@@ -90,4 +90,9 @@ def stat_role_price_by_team(teamname):
     ])
     return [r for r in res]
 
+def sort_player_by_price():
+    collection=db.player
+    res = collection.find().sort("price",-1)
+    return [r for r in res]
+
 
