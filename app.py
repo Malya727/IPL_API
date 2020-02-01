@@ -67,5 +67,10 @@ def max_paid_batsman():
     stat = idb.sort_player_by_price()
     return jsonify({"stat":stat})
 
+@app.route("/ipl/maxbyrole/<role>")
+def max_price_by_role(role):
+    stat = idb.get_max_price_by_role(role)
+    return jsonify({"stat":stat})
+
 if __name__ == "__main__":
     app.run()

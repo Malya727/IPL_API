@@ -96,3 +96,7 @@ def sort_player_by_price():
     return [r for r in res]
 
 
+def get_max_price_by_role(role):
+    collection=db.player
+    res = collection.find({"role":role}).sort("price",-1).limit(1)
+    return [r for r in res]
